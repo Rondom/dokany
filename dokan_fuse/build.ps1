@@ -6,6 +6,7 @@ $script:failed = 0
     New-Item -Force -Type Directory $buildDir
     & C:\cygwin\bin\bash -lc "
         cd '$currentPath'/'$buildDir' &&
+        echo `$PATH &&
         cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
         make -j `$(getconf _NPROCESSORS_ONLN) install"
     & C:\cygwin\bin\bash -lc "
@@ -21,6 +22,7 @@ $script:failed = 0
     New-Item -Force -Type Directory $buildDir
     & C:\cygwin64\bin\bash -lc "
         cd '$currentPath'/'$buildDir' &&
+        echo `$PATH &&
         cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
         make -j `$(getconf _NPROCESSORS_ONLN) install"
     & C:\cygwin64\bin\bash -lc "
