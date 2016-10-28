@@ -7,7 +7,7 @@ $script:failed = 0
     & C:\cygwin\bin\bash -lc "
         cd '$currentPath'/'$buildDir' &&
         echo `$PATH &&
-        cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
+        /usr/bin/cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
         make -j `$(getconf _NPROCESSORS_ONLN) install"
     & C:\cygwin\bin\bash -lc "
         cd '$currentPath' &&
@@ -23,7 +23,7 @@ $script:failed = 0
     & C:\cygwin64\bin\bash -lc "
         cd '$currentPath'/'$buildDir' &&
         echo `$PATH &&
-        cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
+        /usr/bin/cmake ../../../ -DCMAKE_INSTALL_PREFIX='../../../../$installDir' -DCMAKE_INSTALL_BINDIR=. &&
         make -j `$(getconf _NPROCESSORS_ONLN) install"
     & C:\cygwin64\bin\bash -lc "
         cd '$currentPath' &&
