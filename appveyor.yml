@@ -64,7 +64,7 @@
           
           function updateCygwin($cygwinexe, $installFolder, $cacheFolder) {
             Write-Host "Update Cygwin: $cygwinexe"
-            Exec-External {& cmd /c $cygwinexe -gqnNdO -R $installFolder -s http://dirrors.kernel.org/sourceware/cygwin/ -l $cacheFolder -P cmake -P make -P gcc-core -P gcc-g++}
+            Exec-External {& cmd /c $cygwinexe -gqnNdO -R $installFolder -s http://mirrors.kernel.org/sourceware/cygwin/ -l $cacheFolder -P cmake -P make -P gcc-core -P gcc-g++}
             Write-Host "Update Cygwin: $cygwinexe " -NoNewLine
             Write-Host "[ OK ]" -ForegroundColor Green
           }
@@ -77,7 +77,7 @@
         if ($env:CONFIGURATION -eq "All") {
           function bash($command) {
             Write-Host "MSYS2-Bash: $command"
-            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $command}
+            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c "$command"}
             Write-Host "MSYS2-Bash $command" -NoNewLine
             Write-Host "[ OK ]" -ForegroundColor Green
           }
