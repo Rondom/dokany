@@ -76,11 +76,10 @@
         
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
-          function bash($command) {
-            Write-Host "MSYS2-Bash: $command"
-            $gommand = $command
-            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $gommand }
-            Write-Host "MSYS2-Bash $command" -NoNewLine
+          function bash($bash_command) {
+            Write-Host "MSYS2-Bash: $bash_command"
+            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $bash_command }
+            Write-Host "MSYS2-Bash $bash_command" -NoNewLine
             Write-Host "[ OK ]" -ForegroundColor Green
           }
           New-Item -Force -Type Directory $env:MSYS2_CACHE
