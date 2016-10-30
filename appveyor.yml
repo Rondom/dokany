@@ -34,6 +34,18 @@
 
   install:
     - ps: |
+        function Exec-External {
+          param(
+            [Parameter(Position=0,Mandatory=1)][scriptblock] $command,
+          )
+          & $cmd
+          if ($LASTEXITCODE -ne 0) {
+            throw ("Command returned non-zero error-code $LASTEXITCODE: $cmd")
+          }
+        }
+        Exec-External { & cmd /c echo Test }
+        Exec-External { & cmd /c exit 42 }
+    - ps: |
         if ($env:CONFIGURATION -eq "All") {
           & choco install "--cache-location=${env:CHOCO_CACHE}" doxygen.portable
         }
