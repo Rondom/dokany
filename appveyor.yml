@@ -38,6 +38,7 @@
           param(
             [Parameter(Position=0,Mandatory=1)][scriptblock] $command
           )
+          Write-Host Executing $command
           & $command
           if ($LASTEXITCODE -ne 0) {
             throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
@@ -77,7 +78,8 @@
         if ($env:CONFIGURATION -eq "All") {
           function bash($command) {
             Write-Host "MSYS2-Bash: $command"
-            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $command }
+            $gommand = $command
+            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $gommand }
             Write-Host "MSYS2-Bash $command" -NoNewLine
             Write-Host "[ OK ]" -ForegroundColor Green
           }
