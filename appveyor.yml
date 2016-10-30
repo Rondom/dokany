@@ -2,6 +2,7 @@
   hosts:
     foo.bar: 127.0.0.1
     ftp.stack.nl: 127.0.0.1
+    mirrors.kernel.org: 127.0.0.1
   environment:
     CoverityProjectToken:
       secure: 1mtSEr5uFQI5rdwItPXrR1y4fV+SUWt55lUSQB5o3x8=
