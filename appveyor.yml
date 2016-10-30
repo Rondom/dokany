@@ -43,8 +43,8 @@
             throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
           }
         }
-        Exec-External { & cmd /c echo Test }
-        Exec-External { & cmd /c exit 42 }
+        #Exec-External { & cmd /c echo Test }
+        #Exec-External { & cmd /c exit 42 }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
           & choco install "--cache-location=${env:CHOCO_CACHE}" doxygen.portable
@@ -64,7 +64,7 @@
           
           function updateCygwin($cygwinexe, $installFolder, $cacheFolder) {
             Write-Host "Update Cygwin: " $cygwinexe -NoNewline
-            & cmd /c $cygwinexe -gqnNdO -R $installFolder -s http://mirrors.kernel.org/sourceware/cygwin/ -l $cacheFolder -P cmake -P make -P gcc-core -P gcc-g++
+            Exec-External {& cmd /c $cygwinexe -gqnNdO -R $installFolder -s http://mirrors.kernel.org/sourceware/cygwin/ -l $cacheFolder -P cmake -P make -P gcc-core -P gcc-g++}
             Write-Host " - OK" -ForegroundColor Green
           }
           
