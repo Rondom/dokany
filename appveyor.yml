@@ -77,7 +77,7 @@
         if ($env:CONFIGURATION -eq "All") {
           function bash($command) {
             Write-Host "MSYS2-Bash: $command"
-            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c "$command"}
+            Exec-External {& C:\msys64\usr\bin\bash.exe --login -c $command }
             Write-Host "MSYS2-Bash $command" -NoNewLine
             Write-Host "[ OK ]" -ForegroundColor Green
           }
