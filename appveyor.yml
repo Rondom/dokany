@@ -107,6 +107,16 @@
   before_build:
   # Remove VS build warning http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
   - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  - ps: |
+        function Exec-External {
+          param(
+            [Parameter(Position=0,Mandatory=1)][scriptblock] $command
+          )
+          & $command
+          if ($LASTEXITCODE -ne 0) {
+            throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
+          }
+        }
 
   build_script:
   - ps: |
