@@ -33,6 +33,7 @@
 #    ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
 
   init:
+    - ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
     - ps: |
         function Exec-External {
           param(
@@ -90,12 +91,15 @@
           # install MinGW toolchain
           bash "pacman --sync --noconfirm --cache `"$unix_msys2_cache`" mingw-w64-{x86_64,i686}-toolchain mingw-w64-{x86_64,i686}-cmake"
         }
-        
+
+    - ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
     - ps: |
         if ($env:CONFIGURATION -eq "FsTest") {
+          Write-Host "FsTest: Going to run BCDEDIT and reboot)"
           Exec-External {& Bcdedit.exe -set TESTSIGNING ON}
           Exec-External {& verifier /standard /driver dokan1.sys}
           Write-Host "Before reboot"
+          Start-Sleep -s 10
           Restart-Computer -Force
           Start-Sleep -s 10
         }
