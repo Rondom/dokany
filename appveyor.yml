@@ -27,10 +27,12 @@
 # To debug build issues, add your own fork to AppVeyor and uncomment below.
 # Connection details will be printed to the console output.
 # $blockRdp makes the build block until a file is deleted from the desktop.
-#  init:
-#    ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
-#  on_finish:
-#    ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
+  init:
+    - "SET"
+    - ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
+
+  on_finish:
+    - ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
 
   install:
     - ps: |
@@ -88,8 +90,8 @@
         }
 
   before_build:
-  # Remove VS build warning http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
-  - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+    # Remove VS build warning http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
+    - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
 
   build_script:
   - ps: |
@@ -259,6 +261,35 @@
 
   test: off
   on_success:
+    - ps: |
+        # AppVeyor does not provide us with the SHA1 before a push
+        # Thus we have no baseline for pushes and can only run this for PRs
+        if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
+          $mergeBase = (& git merge-base HEAD "remotes/origin/${env:APPVEYOR_REPO_BRANCH}")
+          if ($mergeBase) {
+            $diffFile = "clang_format_$(& git rev-parse --short $mergeBase)_$(& git rev-parse --short HEAD).diff"
+            & git clang-format --style=file --diff $mergeBase > $diffFile
+            if ((Get-Item $diffFile).length -gt 0) {
+              Add-AppveyorMessage `
+                -Category Warning `
+                -Message "Please check your indentation." `
+                -Details "You may want to run ``git clang-format --style file`` on each of your commits." +
+                  "A diff of the suggested changes is available here:" +
+                  "https://ci.appveyor.com/api/buildjobs/$([System.Web.HttpUtility]::UrlEncode($env:APPVEYOR_JOB_ID))/artifacts/$([System.Web.HttpUtility]::UrlEncode($diffFile))"
+              Push-AppveyorArtifact $diffFile
+            }
+            else {
+              Add-AppveyorMessage `
+                -Category Information `
+                -Message "Your indentation is fine. clang-format did not suggest any changes."
+            }
+          }
+          else {
+            Add-AppveyorMessage `
+              -Category Warning `
+              -Message "Could not find merge-base needed for running clang-format"
+          }
+        }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
             if (!$env:AccessTokenDokanDoc -or "$env:APPVEYOR_PULL_REQUEST_TITLE" -or "$env:APPVEYOR_REPO_BRANCH" -ne "master") {
