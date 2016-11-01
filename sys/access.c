@@ -25,10 +25,10 @@ NTSTATUS
 DokanGetAccessToken(__in PDEVICE_OBJECT DeviceObject, __in PIRP Irp) {
   KIRQL oldIrql = 0;
   PLIST_ENTRY thisEntry, nextEntry, listHead;
-  PIRP_ENTRY irpEntry;
-  PDokanVCB vcb;
-  PEVENT_INFORMATION eventInfo;
-  PACCESS_TOKEN accessToken;
+PIRP_ENTRY irpEntry;
+             PDokanVCB vcb;
+PEVENT_INFORMATION eventInfo;
+            PACCESS_TOKEN accessToken;
   NTSTATUS status = STATUS_INVALID_PARAMETER;
   HANDLE handle;
   PIO_STACK_LOCATION irpSp = NULL;
@@ -41,7 +41,7 @@ DokanGetAccessToken(__in PDEVICE_OBJECT DeviceObject, __in PIRP Irp) {
   vcb = DeviceObject->DeviceExtension;
 
   __try {
-    eventInfo = (PEVENT_INFORMATION)Irp->AssociatedIrp.SystemBuffer;
+       eventInfo = (PEVENT_INFORMATION)Irp->AssociatedIrp.SystemBuffer;
     ASSERT(eventInfo != NULL);
 
     if (Irp->RequestorMode != UserMode) {
@@ -103,7 +103,7 @@ DokanGetAccessToken(__in PDEVICE_OBJECT DeviceObject, __in PIRP Irp) {
         SeQuerySubjectContextToken(&accessState->SubjectSecurityContext);
     if (accessToken == NULL) {
       DDbgPrint("  accessToken == NULL\n");
-      __leave;
+        __leave;
     }
     // NOTE: Accessing *SeTokenObjectType while acquring sping lock causes
     // BSOD on Windows XP.
