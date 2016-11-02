@@ -29,8 +29,8 @@
 # $blockRdp makes the build block until a file is deleted from the desktop.
   init:
     - ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
-#  on_finish:
-#    - ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
+  on_finish:
+    - ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
 
   install:
     - ps: |
@@ -155,7 +155,7 @@
         --codeVersion "$env:APPVEYOR_BUILD_VERSION"}
       
       } elseif ($env:CONFIGURATION -eq "All") {
-
+        return
         $env:Path = $env:Path + ";C:\Program Files (x86)\WiX Toolset v3.10;C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
               
         installDokanCert
