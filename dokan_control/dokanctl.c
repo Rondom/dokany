@@ -78,11 +78,11 @@ int InstallDriver(LPCWSTR driverFullPath) {
 
   if (!DokanServiceInstall(DOKAN_DRIVER_SERVICE, SERVICE_FILE_SYSTEM_DRIVER,
                            DOKAN_DRIVER_FULL_PATH)) {
-    fprintf(stderr, "Driver install failed\n");
+        fprintf(stderr, "Driver install failed\n");
     return EXIT_FAILURE;
   }
 
-  fprintf(stdout, "Driver installation succeeded!\n");
+fprintf(stdout, "Driver installation succeeded!\n");
   return EXIT_SUCCESS;
 }
 
