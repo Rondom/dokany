@@ -15,8 +15,8 @@
   os: Visual Studio 2015
   version: 1.0.1-{build}
   configuration:
-  - All
-  - Coverity
+#  - All
+#  - Coverity
   - FsTest
   platform:
   - x64
