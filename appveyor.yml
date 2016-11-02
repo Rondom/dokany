@@ -204,7 +204,14 @@
         Write-Host Artifcat uploaded!
         
       } elseif ($env:CONFIGURATION -eq "FsTest") {
-        
+        # checking for BSOD
+        $bugchecks = (Get-EventLog -LogName system | Where-Object {$_.eventID -eq '1001' -and $_.Source -like 'bugcheck'} | Select-Object -Property *)
+        if ($bugchecks) {
+          Write-Host "It seems like we rebooted due to a bugcheck (BSOD)."
+          Write-Host $bugchecks
+          Push-AppveyorArtifact "$env:WINDIR\MEMORY.DMP"
+        }
+
         $env:Path = $env:Path + ";C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
         
         $buildArgs = @(
