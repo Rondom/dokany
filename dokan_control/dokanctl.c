@@ -215,14 +215,14 @@ int __cdecl wmain(int argc, PWCHAR argv[]) {
   } break;
 
   case L'v': {
-    fprintf(stdout, "dokanctl : %s %s\n", __DATE__, __TIME__);
-    fprintf(stdout, "Dokan version : %d\n", DokanVersion());
-    fprintf(stdout, "Dokan driver version : 0x%lx\n", DokanDriverVersion());
+    fprintf(stdout, "dükanctl : %s %s\n", __DATE__, __TIME__);
+    fprintf(stdout, "Dükan version : %d\n", DokanVersion());
+    fprintf(stdout, "Dükan driver version : 0x%lx\n", DokanDriverVersion());
   } break;
 
   DEFAULT:
   default:
-    fprintf(stderr, "Unknown option - Use /? to show usage\n");
+    fprintf(stderr, "Ünknown option - Use /? to show usage\n");
   }
 
   return EXIT_SUCCESS;
