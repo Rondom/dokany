@@ -1,20 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ImportGroup Label="PropertySheets" />
-  <PropertyGroup Label="UserMacros">
-    <DOKANAPIVersion>1</DOKANAPIVersion>
-    <DOKANVersion>1.0.3</DOKANVersion>
+  <PropertyGroup>
+    <!--
+    DokanBaseVersion is read from dokan_version.txt and DokanBuildNumber is 0 by default.
+    Both variables can be set as properties as well, though and will not be overwritten
+    if they are set.
+
+    The version is constructed as follows:
+    The DokanBuildNumber is added to the last component (patch) of the DokanBaseVersion.
+    For example a DokanBaseVersion 1.2.3.4000 and a build 567 would turn into version 1.2.3.4567
+
+    This logic is also implemented in the dokan_fuse CMake build.
+    So any changes to the logic here should be reflected there as well.
+
+    List of places where the version is / could be used (no guarantee for accuracy):
+    * Resources in binaries (EXE, DLL, SYS)
+    * Driver INF-Files
+    * Installer-Version (both MSI and Bundle)
+    * Installer MSI ProductId
+    * Build-time consistency check of DOKAN_VERSION constant in dokan.h
+    * Build-time consistency check of DOKAN_API_VERSION constant
+	-->
+    <DokanBaseVersionFile>$(SolutionDir)\dokan_version.txt</DokanBaseVersionFile>
+
+    <DokanBaseVersion>$([MSBuild]::ValueOrDefault(
+      $(DokanBaseVersion),
+	  $([System.IO.File]::ReadAllText($(DokanBaseVersionFile)))
+	))</DokanBaseVersion>
+    <DokanBuildNumber>$([MSBuild]::ValueOrDefault(
+      $(DokanBuildNumber),
+      0
+    ))</DokanBuildNumber>
+
+    <DokanVersionMajor>$(DokanBaseVersion.Split('.')[0])</DokanVersionMajor>
+    <DokanVersionMinor>$(DokanBaseVersion.Split('.')[1])</DokanVersionMinor>
+    <DokanVersionMinorMinor>$(DokanBaseVersion.Split('.')[2])</DokanVersionMinorMinor>
+    <DokanVersionPatch>$([MSBuild]::Add($(DokanBaseVersion.Split('.')[3]), $(DokanBuildNumber)))</DokanVersionPatch>
+
+    <!-- Used for the NT-device name, DLL and SYS filename etc. -->
+    <DOKANAPIVersion>$(DokanVersionMajor)</DOKANAPIVersion>
+    <DokanVersionDot>$(DokanVersionMajor).$(DokanVersionMinor).$(DokanVersionMinorMinor).$(DokanVersionPatch)</DokanVersionDot>
+    <DokanVersionComma>$(DokanVersionMajor),$(DokanVersionMinor),$(DokanVersionMinorMinor),$(DokanVersionPatch)</DokanVersionComma>
+
+    <!-- To be used inside <PreprocessorDefinitions> of <ResourceCompile> and <ClCompile> -->
+    <DokanPreprocessorDefinitions>DOKAN_BUILD_VERSION_COMMA=$(DokanVersionComma);DOKAN_BUILD_VERSION_DOT=$(DokanVersionDot);DOKAN_BUILD_MAJOR_API_VERSION=$(DOKANAPIVersion)</DokanPreprocessorDefinitions>
+    <!-- Used for WIX -->
+    <DokanWixDefinitions>DOKAN_BUILD_VERSION_DOT=$(DokanVersionDot)</DokanWixDefinitions>
   </PropertyGroup>
-  <PropertyGroup />
-  <ItemDefinitionGroup />
-  <ItemGroup>
-    <BuildMacro Include="DOKANAPIVersion">
-      <Value>$(DOKANAPIVersion)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-      <BuildMacro Include="DOKANVersion">
-      <Value>$(DOKANVersion)</Value>
-      <EnvironmentVariable>true</EnvironmentVariable>
-    </BuildMacro>
-  </ItemGroup>
 </Project>

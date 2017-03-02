@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 2.8.5)
+cmake_minimum_required(VERSION 3.4.0)
 project(dokanfuse1)
 include(GNUInstallDirs)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 if(NOT CMAKE_BUILD_TYPE)
     message("No CMAKE_BUILD_TYPE specified, defaulting to Release")
@@ -11,6 +12,8 @@ option(FUSE_PKG_CONFIG "Install a libfuse-compatible pkg-config file (fuse.pc)" 
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -mwin32 -Wall")
 add_definitions(-D_FILE_OFFSET_BITS=64)
+include(dokan_version)
+
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/../sys

@@ -10,14 +10,17 @@
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+#define STRINGIFY_X(x) #x
+#define STRINGIFY(x) STRINGIFY_X(x)
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Version
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,3,1000
- PRODUCTVERSION 1,0,3,1000
+ FILEVERSION DOKAN_BUILD_VERSION_COMMA
+ PRODUCTVERSION DOKAN_BUILD_VERSION_COMMA
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -34,12 +37,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Dokan Project"
             VALUE "FileDescription", "Dokan Driver"
-            VALUE "FileVersion", "1.0.3.1000"
-            VALUE "InternalName", "dokan.sys"
+            VALUE "FileVersion", STRINGIFY(DOKAN_BUILD_VERSION_DOT)
+            VALUE "InternalName", "dokan" STRINGIFY(DOKAN_BUILD_API_VERSION) ".sys"
             VALUE "LegalCopyright", "Copyright (C) 2017"
-            VALUE "OriginalFilename", "dokan.sys"
+            VALUE "OriginalFilename", "dokan" STRINGIFY(DOKAN_BUILD_API_VERSION) ".sys"
             VALUE "ProductName", "Dokan"
-            VALUE "ProductVersion", "1.0.3.1000"
+            VALUE "ProductVersion", STRINGIFY(DOKAN_BUILD_VERSION_DOT)
         END
     END
     BLOCK "VarFileInfo"
