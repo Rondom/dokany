@@ -55,6 +55,20 @@
     - ps: |
         New-Item -ItemType Directory -Force -Path ${env:DOKAN_CI_CACHE} | Out-Null
     - ps: |
+        # Available in all configurations
+        $xmlversion = [xml](Get-Content "${env:APPVEYOR_BUILD_FOLDER}\dokan_wix\version.xml")
+        $current_build_version = $xmlversion.Include.define | Where { $_.StartsWith("BuildVersion=") }
+        $mm_version = $current_build_version.Split("=")[1] -replace '"','';
+        $mm_version = $mm_version.Substring(0, $mm_version.Length - $env:APPVEYOR_BUILD_NUMBER.Length - 1);
+        $mm_version += $env:APPVEYOR_BUILD_NUMBER;
+        (Get-Content "${env:APPVEYOR_BUILD_FOLDER}\CHANGELOG.md") -replace '[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,4}', ($env:APPVEYOR_BUILD_VERSION.Split("-")[0] + '.' + $mm_version) | out-file "${env:APPVEYOR_BUILD_FOLDER}\CHANGELOG.md"
+        $installer_version = $env:APPVEYOR_BUILD_VERSION.Split("-")[0] + '.' + $mm_version;
+        Write-Host $installer_version
+        Write-Host $mm_version
+        Write-Host $current_build_version
+        Write-Host $xmlversion
+        Update-AppveyorBuild -Version $mm_version
+    - ps: |
         if ($env:CONFIGURATION -eq "FsTest" -or $env:CONFIGURATION -eq "All") {
           .\cert\dokan-import.ps1
         }
@@ -222,15 +236,6 @@
         }
       }
 
-  - ps: |
-      # Available in all configurations
-      $xmlversion = [xml](Get-Content "${env:APPVEYOR_BUILD_FOLDER}\dokan_wix\version.xml")
-      $current_build_version = $xmlversion.Include.define | Where { $_.StartsWith("BuildVersion=") }
-      $mm_version = $current_build_version.Split("=")[1] -replace '"','';
-      $mm_version = $mm_version.Substring(0, $mm_version.Length - $env:APPVEYOR_BUILD_NUMBER.Length - 1);
-      $mm_version += $env:APPVEYOR_BUILD_NUMBER;
-      (Get-Content "${env:APPVEYOR_BUILD_FOLDER}\CHANGELOG.md") -replace '[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{1,4}', ($env:APPVEYOR_BUILD_VERSION.Split("-")[0] + '.' + $mm_version) | out-file "${env:APPVEYOR_BUILD_FOLDER}\CHANGELOG.md"
-      $installer_version = $env:APPVEYOR_BUILD_VERSION.Split("-")[0] + '.' + $mm_version;
   - ps: |
       if ($env:CONFIGURATION -eq "All") {
         $env:Path = $env:Path + ";C:\Program Files (x86)\WiX Toolset v3.10;C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
