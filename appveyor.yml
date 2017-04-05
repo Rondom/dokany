@@ -12,7 +12,7 @@
       MSYS2_CACHE: '%DOKAN_CI_CACHE%\msys2'
       CHOCO_CACHE: '%DOKAN_CI_CACHE%\choco'
 
-  os: Visual Studio 2015
+  os: Visual Studio 2017
   version: 1.0.3-{build}
   configuration:
   - All
