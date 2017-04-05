@@ -2,7 +2,7 @@
 REM Build release to prepare for packaging
 
 REM Make sure MSBUILD is available
-set PATH=%PATH%;%PROGRAMFILES(x86)%\MSBuild\14.0\Bin
+set PATH=%PROGRAMFILES(x86)%\MSBuild\14.0\Bin;%PATH%
 set VCTargetsPath=%PROGRAMFILES%
 IF %processor_architecture%==AMD64 set VCTargetsPath=%PROGRAMFILES(x86)%
 set VCTargetsPath=%VCTargetsPath%\MSBuild\Microsoft.Cpp\v4.0\V140
