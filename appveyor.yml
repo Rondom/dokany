@@ -153,6 +153,7 @@
         Write-Host Dokan cert installed !
       }
 
+  - ps: |
       if ($env:CONFIGURATION -eq "Coverity") {
         
         if (!"$env:CoverityProjectToken") {
@@ -187,8 +188,10 @@
         -z "coverity.zip" `
         -d "Appveyor build." `
         --codeVersion "$env:APPVEYOR_BUILD_VERSION"}
-      
-      } elseif ($env:CONFIGURATION -eq "All") {
+      }
+
+  - ps: |
+      if ($env:CONFIGURATION -eq "All") {
 
         $env:Path = $env:Path + ";C:\Program Files (x86)\WiX Toolset v3.10;C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
               
@@ -235,9 +238,11 @@
         
         Write-Host Upload Artifact...
         Push-AppveyorArtifact "${env:APPVEYOR_BUILD_FOLDER}\dokan_wix\Bootstrapper\bin\Release\DokanSetup.exe" -FileName ("DokanSetup-" + $installer_version + ".exe")
-        Write-Host Artifact uploaded!
-        
-      } elseif ($env:CONFIGURATION -eq "FsTest") {
+        Write-Host Artifact uploaded!        
+      }
+
+  - ps: |
+      if ($env:CONFIGURATION -eq "FsTest") {
         $env:Path = $env:Path + ";C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
         
         $buildArgs = @(
@@ -269,9 +274,12 @@
         
         Exec-External {& verifier /query}
       }
+
+  - ps: |
       Write-Host Build Finished !
 
   test: off
+
   on_success:
     - ps: |
         # AppVeyor does not provide us with the SHA1 before the push
