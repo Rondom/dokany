@@ -11,6 +11,7 @@
       CYG_CACHE: '%DOKAN_CI_CACHE%\cygwin'
       MSYS2_CACHE: '%DOKAN_CI_CACHE%\msys2'
       CHOCO_CACHE: '%DOKAN_CI_CACHE%\choco'
+      WLK_INST_CACHE: '%DOKAN_CI_CACHE%\wlk_inst'
 
   os: Visual Studio 2015
   version: 1.0.3-{build}
@@ -18,6 +19,7 @@
   - All
   - Coverity
   - FsTest
+
   platform:
   - x64
   
@@ -57,6 +59,14 @@
           if ($LASTEXITCODE -ne 0) {
             throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
           }
+        }
+    - ps: |
+        if ($env:CONFIGURATION -eq "FsTest") {
+          Exec-External {& net user dokan_ifstest D0kan_1fstest /ADD }
+        }
+    - ps: |
+        if ($env:CONFIGURATION -eq "FsTest") {
+          .\scripts\install_wlk_ifstest.ps1
         }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
@@ -108,24 +118,6 @@
         }
 
   before_build:
-  - ps: |
-      # checking for BSOD
-      $bugchecks = (Get-EventLog -LogName system | Where-Object {$_.eventID -eq '1001' -and $_.Source -eq 'BugCheck'} | Select-Object -Property *)
-      if ($bugchecks) {
-        Write-Host "It seems like we rebooted due to a bugcheck (BSOD)."
-        Format-List -InputObject $bugchecks | Out-String | Out-Host
-        $memdumpArchive = "memory_dmp_$(& git rev-parse --short HEAD)_${env:APPVEYOR_BUILD_VERSION}.7z"
-        Write-Host "Compressing MEMORY.DMP"
-        Exec-External { &7z a -t7z $memdumpArchive "$env:WINDIR\MEMORY.DMP" }
-        Push-AppveyorArtifact $memdumpArchive
-        Write-Host "MEMORY.DMP uploaded as build artifact $memdumpArchive"
-        Add-AppveyorMessage `
-          -Category Error `
-          -Message "BSOD encountered during $env:CONFIGURATION. Link to MEMORY.DMP in the description " `
-          -Details ("MEMORY.DMP is available here: " + `
-            "https://ci.appveyor.com/api/buildjobs/$([System.Web.HttpUtility]::UrlEncode($env:APPVEYOR_JOB_ID))/artifacts/$([System.Web.HttpUtility]::UrlEncode($memdumpArchive))")
-        throw "Build failed due to BSOD during $env:CONFIGURATION"
-      }
   # Remove VS build warning http://help.appveyor.com/discussions/problems/4569-the-target-_convertpdbfiles-listed-in-a-beforetargets-attribute-at-c-does-not-exist-in-the-project-and-will-be-ignored
   - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
 
@@ -143,6 +135,7 @@
         Write-Host Dokan cert installed !
       }
 
+  - ps: |
       if ($env:CONFIGURATION -eq "Coverity") {
         
         if (!"$env:CoverityProjectToken") {
@@ -177,8 +170,10 @@
         -z "coverity.zip" `
         -d "Appveyor build." `
         --codeVersion "$env:APPVEYOR_BUILD_VERSION"}
-      
-      } elseif ($env:CONFIGURATION -eq "All") {
+      }
+
+  - ps: |
+      if ($env:CONFIGURATION -eq "All") {
 
         $env:Path = $env:Path + ";C:\Program Files (x86)\WiX Toolset v3.10;C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
               
@@ -225,9 +220,11 @@
         
         Write-Host Upload Artifact...
         Push-AppveyorArtifact "${env:APPVEYOR_BUILD_FOLDER}\dokan_wix\Bootstrapper\bin\Release\DokanSetup.exe" -FileName ("DokanSetup-" + $installer_version + ".exe")
-        Write-Host Artifact uploaded!
-        
-      } elseif ($env:CONFIGURATION -eq "FsTest") {
+        Write-Host Artifact uploaded!        
+      }
+
+  - ps: |
+      if ($env:CONFIGURATION -eq "FsTest") {
         $env:Path = $env:Path + ";C:\Program Files (x86)\Windows Kits\8.1\bin\x64\"
         
         $buildArgs = @(
@@ -259,9 +256,48 @@
         
         Exec-External {& verifier /query}
       }
+
+  - ps: |
       Write-Host Build Finished !
 
+  after_build:
+  - ps: |
+      # This function has already been defined above, but in case of a reboot caused by a BSOD, we cannot
+      # rely on it being defined!
+      function Exec-External {
+        param(
+          [Parameter(Position=0,Mandatory=1)][scriptblock] $command
+        )
+        & $command
+        if ($LASTEXITCODE -ne 0) {
+          throw ("Command returned non-zero error-code ${LASTEXITCODE}: $command")
+        }
+      }
+  - ps: |
+      # checking for BSOD
+      $bugchecks = (Get-EventLog -LogName system | Where-Object {$_.eventID -eq '1001' -and $_.Source -eq 'BugCheck'} | Select-Object -Property *)
+      if ($bugchecks) {
+        Write-Host "It seems like we rebooted due to a bugcheck (BSOD)."
+        Format-List -InputObject $bugchecks | Out-String | Out-Host
+        # events are sorted descendingly by time, so $bugchecks[0] is the latest BSOD
+        $memory_dmp = $bugchecks[0].ReplacementStrings[1]
+        Write-Host Calling KD to get more information...
+        Exec-External {& "C:\Program Files (x86)\Windows Kits\10\Debuggers\x64\kd.exe" -z $memory_dmp -y "SRV*${env:APPVEYOR_BUILD_FOLDER}\x64\Win8.1Release\*http://msdl.microsoft.com/download/symbols" -c "!analyze -v; q" }
+        $memdumpArchive = "memory_dmp_$(& git rev-parse --short HEAD)_${env:APPVEYOR_BUILD_VERSION}.7z"
+        Write-Host "Compressing $memory_dmp"
+        Exec-External { &7z a -t7z $memdumpArchive $memory_dmp }
+        Push-AppveyorArtifact $memdumpArchive
+        Write-Host "MEMORY.DMP uploaded as build artifact $memdumpArchive"
+        Add-AppveyorMessage `
+          -Category Error `
+          -Message "BSOD encountered during $env:CONFIGURATION. Link to MEMORY.DMP in the description" `
+          -Details ("MEMORY.DMP is available here: " + `
+            "https://ci.appveyor.com/api/buildjobs/$([System.Web.HttpUtility]::UrlEncode($env:APPVEYOR_JOB_ID))/artifacts/$([System.Web.HttpUtility]::UrlEncode($memdumpArchive))")
+        throw "Build failed due to BSOD during $env:CONFIGURATION"
+      }
+
   test: off
+
   on_success:
     - ps: |
         # AppVeyor does not provide us with the SHA1 before the push
