@@ -47,6 +47,9 @@
 
   install:
     - ps: |
+        Write-Host $([Environment]::OSVersion.Version)
+        throw foo
+    - ps: |
         if ($env:CONFIGURATION -eq "FsTest" -or $env:CONFIGURATION -eq "All") {
           .\cert\dokan-import.ps1
         }
