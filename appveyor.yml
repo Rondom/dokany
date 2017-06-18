@@ -80,7 +80,7 @@
         }
     - ps: |
         if ($env:CONFIGURATION -eq "FsTest") {
-          .\scripts\install_wlk_ifstest.ps1
+          Exec-External {& powershell .\scripts\install_wlk_ifstest.ps1 }
         }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
@@ -260,7 +260,7 @@
         $mirrors = @("${env:DokanLibrary1}\sample\mirror\mirror.exe", "${env:DokanLibrary1}\x86\sample\mirror\mirror.exe")
 
         cd .\samples
-        .\mirror_test.ps1 -Mirrors $mirrors
+        Exec-External {& powershell .\mirror_test.ps1 -Mirrors $mirrors}
       }
   - ps: |
       if ($env:CONFIGURATION -eq "FsTest") {
