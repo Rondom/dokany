@@ -80,7 +80,7 @@
         }
     - ps: |
         if ($env:CONFIGURATION -eq "FsTest") {
-          .\scripts\install_wlk_ifstest.ps1
+          Exec-External {& powershell .\scripts\install_wlk_ifstest.ps1 }
         }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
