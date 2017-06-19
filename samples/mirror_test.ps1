@@ -113,7 +113,8 @@ foreach ($mirror in $Mirrors){
 		Write-Host "WinFSTest finished" -ForegroundColor Green
 
 		Write-Host "Start IFSTest" -ForegroundColor Green
-		Exec-External {& "..\scripts\run_ifstest.ps1" @ifstestParameters "$($destination)\"}
+		#Exec-External {& "..\scripts\run_ifstest.ps1" @ifstestParameters "$($destination)\"}
+		Write-Host "Disabled to test hypothesis about marinkos PR causing probs on my VM but not on AppVeyor"
 		Write-Host "IFSTestTest finished" -ForegroundColor Green
 
 		[System.Windows.Forms.SendKeys]::SendWait("^{c}") 
