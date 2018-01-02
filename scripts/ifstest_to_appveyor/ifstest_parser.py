@@ -165,6 +165,7 @@ def parse(file, test_case_queue):
         print(line, end='')
         state = state.transition(line.rstrip('\n'))
         if state.is_final:
+            print("Reached final state")
             return
 
     state = state.transition(None) # EOF

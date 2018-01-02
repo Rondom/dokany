@@ -33,18 +33,23 @@ class AppVeyorSender():
         self.finished = False
 
     def consumer_loop(self):
-        while not self.finished:
-            tests_to_send = self.__get_bulk_of_tests_from_queue()
-            if tests_to_send[-1].get('IsFinished'):
-                self.finished = True
-                tests_to_send = tests_to_send[:-1]
+        try:
+            while not self.finished:
+                tests_to_send = self.__get_bulk_of_tests_from_queue()
+                print("Got", len(tests_to_send), "from queue")
+                if tests_to_send[-1].get('IsFinished'):
+                    print("Got finished", file=sys.stderr)
+                    self.finished = True
+                    tests_to_send = tests_to_send[:-1]
 
-            appveyor_data = [self.__convert_ifstest_data_to_appveyor(t) for t in tests_to_send]
-            if self.build_worker_api_url:
-                response = requests.post(self.build_worker_api_url + 'api/tests/batch', json=appveyor_data)
-                response.raise_for_status()
-            else:
-                pprint(appveyor_data)
+                appveyor_data = [self.__convert_ifstest_data_to_appveyor(t) for t in tests_to_send]
+                if self.build_worker_api_url:
+                    response = requests.post(self.build_worker_api_url + 'api/tests/batch', json=appveyor_data)
+                    response.raise_for_status()
+                else:
+                    pprint(appveyor_data)
+        except:
+            sys.exit(1)
 
     def __get_bulk_of_tests_from_queue(self):
         tests_to_send = []
