@@ -137,6 +137,7 @@ class ProcessTestCaseState(State):
                 self.test_case_queue.append(self.test_case_data)
             #pprint(self.test_case_data)
             #print()
+            sys.stdout.flush()
             return WaitForTestCaseState(self, **new_kwargs)
 
         def continue_line(previous_state, **new_kwargs):

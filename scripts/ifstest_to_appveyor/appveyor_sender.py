@@ -33,8 +33,8 @@ class AppVeyorSender():
         self.finished = False
 
     def consumer_loop(self):
-        try:
-            while not self.finished:
+        while not self.finished:
+            try:
                 tests_to_send = self.__get_bulk_of_tests_from_queue()
                 print("Got", len(tests_to_send), "from queue")
                 if tests_to_send[-1].get('IsFinished'):
@@ -48,8 +48,9 @@ class AppVeyorSender():
                     response.raise_for_status()
                 else:
                     pprint(appveyor_data)
-        except:
-            sys.exit(1)
+            except:
+                print("exception", file=sys.stderr)
+        print("finsihed consumer loop", len(self.queue))
 
     def __get_bulk_of_tests_from_queue(self):
         tests_to_send = []
