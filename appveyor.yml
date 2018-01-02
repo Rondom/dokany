@@ -12,6 +12,8 @@
       MSYS2_CACHE: '%DOKAN_CI_CACHE%\msys2'
       CHOCO_CACHE: '%DOKAN_CI_CACHE%\choco'
       WLK_INST_CACHE: '%DOKAN_CI_CACHE%\wlk_inst'
+      PIP_INST_CACHE: '%DOKAN_CI_CACHE%\pip'
+      PY3_PATH: 'C:\Python36-x64'
       DOKAN_MAIN_BUILD_JOB_NAME: "Image: Visual Studio 2017; Configuration: All"
 
   version: 1.1.0-{build}
@@ -87,6 +89,10 @@
     - ps: |
         if ($env:CONFIGURATION -eq "FsTest") {
           Exec-External {& powershell .\scripts\install_wlk_ifstest.ps1 }
+        }
+    - ps: |
+        if ($env:CONFIGURATION -eq "FsTest") {
+          Exec-External {& "${env:PY3_PATH}\Scripts\pip" install --cache-dir $env:PIP_INST_CACHE -r .\scripts\ifstest_to_appveyor\requirements.txt }
         }
     - ps: |
         if ($env:CONFIGURATION -eq "All") {
