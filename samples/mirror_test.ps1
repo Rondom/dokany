@@ -166,16 +166,18 @@ foreach ($mirror in $Mirrors) {
 		}
 
 		Write-Host "Start FSX Test" -ForegroundColor Green
-		Exec-External {& .\fstools\src\fsx\fsx.exe -N 5000 "$($destination)\fsxtest"}
+		#Exec-External {& .\fstools\src\fsx\fsx.exe -N 5000 "$($destination)\fsxtest"}
 		Write-Host "FSX Test finished" -ForegroundColor Green
 
 		Write-Host "Start WinFSTest" -ForegroundColor Green
-		Exec-External {& .\winfstest\TestSuite\run-winfstest.bat . "$($destination)\"}
+		#Exec-External {& .\winfstest\TestSuite\run-winfstest.bat . "$($destination)\"}
 		Write-Host "WinFSTest finished" -ForegroundColor Green
 
 		if ($destination -match "[a-zA-Z]:") {
 			Write-Host "Start IFSTest" -ForegroundColor Green
-			Exec-External {& "..\scripts\run_ifstest.ps1" @ifstestParameters "$($destination)\"}
+			Exec-External {
+				& "..\scripts\run_ifstest.ps1" @ifstestParameters "$($destination)\" | & "${env:PY3_PATH}\python" ..\scripts\ifstest_to_appveyor\ifstest_to_appveyor.py --prefix="${Name}_"
+			}
 			Write-Host "IFSTest finished" -ForegroundColor Green
 		} else {
 			Write-Host "Skipping IFSTest, because it cannot be run against UNC-Paths" -ForegroundColor Green
