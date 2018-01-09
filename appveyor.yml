@@ -18,8 +18,8 @@
 
   version: 2.0.0-{build}
   configuration:
-#  - All
-#  - Coverity
+  - All
+  - Coverity
   - FsTest
 
   image:
@@ -42,16 +42,10 @@
 # To debug build issues, add your own fork to AppVeyor and uncomment below.
 # Connection details will be printed to the console output.
 # $blockRdp makes the build block until a file is deleted from the desktop.
-  init:
-    - ps: |
-        Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
-        Write-Host $env:APPVEYOR_API_URL
-  on_finish:
-    - ps: |
-        if ($env:CONFIGURATION -eq "FsTest") {
-          $blockRdp = $false;
-          Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
-        }
+#  init:
+#    - ps: Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
+#  on_finish:
+#    - ps: $blockRdp = $true; Invoke-Expression (Invoke-WebRequest 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')
 
   install:
     - ps: |
@@ -244,8 +238,8 @@
           "Content-Type" = "application/json"
         }
         $build_info = Invoke-RestMethod -Method Get -Uri $api_build_info_url -Headers $headers -UserAgent "Dokany CI-Script ${env:APPVEYOR_JOB_ID}"
-        $main_build_job_id = 'sr2dlt8ngtiey09q' #($build_info.Build.jobs | Where-Object {$_.name -eq $env:DOKAN_MAIN_BUILD_JOB_NAME}).jobId
-        $installer_url = "${env:APPVEYOR_URL}/api/buildjobs/${main_build_job_id}/artifacts/DokanSetup-1.1.0.1442.exe"
+        $main_build_job_id = ($build_info.Build.jobs | Where-Object {$_.name -eq $env:DOKAN_MAIN_BUILD_JOB_NAME}).jobId
+        $installer_url = "${env:APPVEYOR_URL}/api/buildjobs/${main_build_job_id}/artifacts/DokanSetup-${installer_version}.exe"
 
         Write-Host "Downloading installer artifact from main build job ${main_build_job_id}..."
         Invoke-WebRequest $installer_url -OutFile DokanSetup.exe

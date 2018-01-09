@@ -166,11 +166,11 @@ foreach ($mirror in $Mirrors) {
 		}
 
 		Write-Host "Start FSX Test" -ForegroundColor Green
-		#Exec-External {& .\fstools\src\fsx\fsx.exe -N 5000 "$($destination)\fsxtest"}
+		Exec-External {& .\fstools\src\fsx\fsx.exe -N 5000 "$($destination)\fsxtest"}
 		Write-Host "FSX Test finished" -ForegroundColor Green
 
 		Write-Host "Start WinFSTest" -ForegroundColor Green
-		#Exec-External {& .\winfstest\TestSuite\run-winfstest.bat . "$($destination)\"}
+		Exec-External {& .\winfstest\TestSuite\run-winfstest.bat . "$($destination)\"}
 		Write-Host "WinFSTest finished" -ForegroundColor Green
 
 		if ($destination -match "[a-zA-Z]:") {
