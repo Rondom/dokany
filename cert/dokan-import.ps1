@@ -7,8 +7,18 @@ if ($testadmin -eq $false)
 	exit $LASTEXITCODE
 }
 
+function Is-SecureBoot-Enabled {
+	try {
+		return Confirm-SecureBootUEFI -ErrorAction Stop
+	}
+	catch [PlatformNotSupportedException] {
+		# BIOS System return false
+		Write-Host "Bios-System"
+		return $false
+	}
+}
 
-if (confirm-securebootUEFI) 
+if (Is-SecureBoot-Enabled)
 {
 	write-Host "Secureboot is enabled. This needs to be disabled so that the driver signed with a self signed certificate can be loaded." -ForegroundColor Red
 	write-host "See https://docs.microsoft.com/en-us/windows-hardware/manufacture/desktop/disabling-secure-boot#span-iddisablesecurebootspandisable-secure-boot for instructions to disable it" -ForegroundColor Red
