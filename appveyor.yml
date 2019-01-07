@@ -17,10 +17,10 @@
 
   version: 1.2.1-{build}
   configuration:
-  - All
-  - Coverity
-  - SonarQube
-  - FsTest
+#  - All
+#  - Coverity
+#  - SonarQube
+#  - FsTest
   - Documentation
 
   image:
